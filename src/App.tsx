@@ -792,21 +792,58 @@ const Section2Interactive = memo(function Section2Interactive() {
 });
 
 // =====================================================
-// 인터랙티브 섹션 3: 숏폼 강의
+// 인터랙티브 섹션 3: 숏폼 강의 (Shorts 스타일 폰 UI)
 // =====================================================
 const Section3Interactive = memo(function Section3Interactive() {
   const { ref, isInView } = useInView(0.3);
-  const [playingVideo, setPlayingVideo] = useState<number | null>(null);
+  const [currentVideo, setCurrentVideo] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [currentTime, setCurrentTime] = useState('');
+
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      setCurrentTime(`${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`);
+    };
+    updateTime();
+    const interval = setInterval(updateTime, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   const videos = [
-    { title: '올바른 수유 자세', duration: '3분' },
-    { title: '트림시키는 방법', duration: '2분' },
-    { title: '기저귀 가는 법', duration: '2분' },
+    { title: '올바른 수유 자세', author: '소아과 전문의', duration: '3:24', likes: '1.2만', thumbnail: '🍼' },
+    { title: '트림시키는 방법', author: '육아 전문가', duration: '2:15', likes: '8.5천', thumbnail: '👶' },
+    { title: '기저귀 교체 팁', author: '베테랑 맘', duration: '1:45', likes: '2.3만', thumbnail: '✨' },
   ];
 
-  const handleVideoClick = (index: number) => {
-    setPlayingVideo(index);
-    setTimeout(() => setPlayingVideo(null), 3000);
+  const handleVideoClick = () => {
+    if (isPlaying) return;
+    setIsPlaying(true);
+    setProgress(0);
+
+    const progressInterval = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(progressInterval);
+          setIsPlaying(false);
+          return 0;
+        }
+        return prev + 2;
+      });
+    }, 60);
+  };
+
+  const handleSwipe = (direction: 'up' | 'down') => {
+    if (direction === 'up' && currentVideo < videos.length - 1) {
+      setCurrentVideo(prev => prev + 1);
+      setIsPlaying(false);
+      setProgress(0);
+    } else if (direction === 'down' && currentVideo > 0) {
+      setCurrentVideo(prev => prev - 1);
+      setIsPlaying(false);
+      setProgress(0);
+    }
   };
 
   return (
@@ -814,6 +851,7 @@ const Section3Interactive = memo(function Section3Interactive() {
       <PaperFlower color="#D8B4FE" size={110} className="top-12 right-16 opacity-40" delay={0.4} />
       <PaperFlower color="#E9D5FF" size={75} className="bottom-16 left-10 opacity-30" delay={0.7} />
 
+      {/* 텍스트 영역 */}
       <div className={`flex-1 space-y-6 text-center md:text-left relative z-10 transition-all duration-700 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#F3E8FF] text-[#8B5CF6] font-bold text-sm">
           <Play size={16} /> 숏폼 육아 강의
@@ -824,69 +862,227 @@ const Section3Interactive = memo(function Section3Interactive() {
         <p className="text-lg text-gray-600 leading-relaxed max-w-lg mx-auto md:mx-0">
           육아가 처음이어도 괜찮아요. 수유법, 기저귀 교체, 목욕법까지 짧은 영상으로 쉽게 배울 수 있어요.
         </p>
+        <p className="text-sm text-[#8B5CF6] font-medium">
+          → 영상을 탭하고 스와이프해보세요!
+        </p>
       </div>
 
+      {/* 폰 영역 */}
       <div
-        className={`flex-1 w-full max-w-md md:max-w-none aspect-square bg-gradient-to-br from-[#F3E8FF] to-[#E9D5FF] rounded-[3rem] p-6 relative shadow-inner transition-all duration-700 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+        className={`flex-1 w-full max-w-md md:max-w-lg relative transition-all duration-700 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
         style={{ transitionDelay: '200ms' }}
       >
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="flex gap-3">
-            {videos.map((video, i) => (
+        <div className="flex items-center justify-center">
+          {/* Shorts 스타일 폰 */}
+          <div
+            className="relative w-[180px] h-[360px] md:w-[220px] md:h-[440px] rounded-[30px] md:rounded-[40px] border-[2px] overflow-hidden flex flex-col shrink-0"
+            style={{
+              background: '#000',
+              borderColor: '#333',
+              boxShadow: isPlaying
+                ? '0 20px 50px rgba(139,92,246,0.3)'
+                : '0 15px 40px rgba(0,0,0,0.3)',
+              transition: 'all 0.5s ease-out',
+            }}
+          >
+            {/* Notch */}
+            <div className="absolute top-0 inset-x-0 h-5 md:h-6 flex justify-center z-50">
+              <div className="w-16 md:w-20 h-3 md:h-4 rounded-b-lg md:rounded-b-xl bg-black border-b border-x border-white/10 flex items-center justify-center gap-1">
+                <div className="w-1 h-1 rounded-full bg-white/30"></div>
+                <div className="w-4 h-0.5 rounded-full bg-white/30"></div>
+              </div>
+            </div>
+
+            {/* Video Content */}
+            <div className="absolute inset-0 flex flex-col">
+              {/* Video Background */}
               <div
-                key={i}
-                onClick={() => handleVideoClick(i)}
-                className={`w-28 h-40 bg-white rounded-2xl shadow-lg overflow-hidden cursor-pointer transition-all duration-500 hover:scale-105 ${playingVideo === i ? 'scale-110 ring-4 ring-[#8B5CF6]' : ''}`}
-                style={{ transform: `rotate(${(i - 1) * 8}deg)`, transitionDelay: `${i * 100}ms` }}
+                className="absolute inset-0 flex items-center justify-center cursor-pointer"
+                onClick={handleVideoClick}
+                style={{
+                  background: `linear-gradient(135deg, #8B5CF6 0%, #6D28D9 50%, #4C1D95 100%)`,
+                }}
               >
-                <div className={`h-24 flex items-center justify-center transition-colors duration-300 ${playingVideo === i ? 'bg-[#8B5CF6]' : 'bg-gradient-to-b from-[#E9D5FF] to-[#F3E8FF]'}`}>
-                  {playingVideo === i ? (
-                    <div className="flex items-center gap-1">
-                      {[...Array(3)].map((_, j) => (
-                        <div key={j} className="w-1 bg-white rounded-full animate-pulse" style={{ height: `${16 + j * 8}px`, animationDelay: `${j * 0.15}s` }} />
+                {/* Thumbnail Emoji */}
+                <span className="text-6xl md:text-8xl opacity-30">{videos[currentVideo].thumbnail}</span>
+
+                {/* Play Button Overlay */}
+                {!isPlaying && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-16 h-16 md:w-20 md:h-20 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                      <Play size={32} className="text-white ml-1" fill="white" />
+                    </div>
+                  </div>
+                )}
+
+                {/* Playing Indicator */}
+                {isPlaying && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="flex items-end gap-1">
+                      {[...Array(5)].map((_, i) => (
+                        <div
+                          key={i}
+                          className="w-2 bg-white rounded-full animate-pulse"
+                          style={{
+                            height: `${20 + Math.sin(i * 1.2 + progress * 0.1) * 30}px`,
+                            animationDelay: `${i * 0.1}s`,
+                          }}
+                        />
                       ))}
                     </div>
-                  ) : (
-                    <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow">
-                      <Play size={18} className="text-[#8B5CF6] ml-0.5" fill="#8B5CF6" />
-                    </div>
-                  )}
-                </div>
-                <div className="p-2">
-                  <p className="text-[10px] text-gray-800 font-medium leading-tight">{video.title}</p>
-                  <p className="text-[10px] text-gray-400">{video.duration}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Status Bar */}
+              <div className="absolute top-6 inset-x-0 h-6 flex items-center justify-between px-4 text-[8px] font-medium text-white/70 z-40">
+                <span>{currentTime}</span>
+                <div className="flex items-center gap-1">
+                  <Wifi size={8} />
+                  <div className="w-3 h-2 rounded-sm border border-white/70"></div>
                 </div>
               </div>
-            ))}
+
+              {/* Video Info Overlay */}
+              <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 to-transparent z-40">
+                <div className="flex items-end justify-between">
+                  <div className="flex-1">
+                    <p className="text-white font-bold text-xs md:text-sm mb-1">{videos[currentVideo].title}</p>
+                    <p className="text-white/70 text-[10px]">@{videos[currentVideo].author}</p>
+                  </div>
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="flex flex-col items-center">
+                      <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                        <span className="text-white text-sm">❤️</span>
+                      </div>
+                      <span className="text-white text-[8px] mt-0.5">{videos[currentVideo].likes}</span>
+                    </div>
+                    <div className="flex flex-col items-center">
+                      <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                        <MessageCircle size={14} className="text-white" />
+                      </div>
+                      <span className="text-white text-[8px] mt-0.5">댓글</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Progress Bar */}
+                <div className="mt-3 w-full h-0.5 bg-white/30 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-white rounded-full transition-all duration-100"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* Swipe Navigation */}
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-40">
+                <button
+                  onClick={() => handleSwipe('down')}
+                  disabled={currentVideo === 0}
+                  className={`w-6 h-6 rounded-full flex items-center justify-center transition-all ${currentVideo === 0 ? 'bg-white/10 text-white/30' : 'bg-white/20 text-white hover:bg-white/30'}`}
+                >
+                  <ChevronDown size={14} className="rotate-180" />
+                </button>
+                <button
+                  onClick={() => handleSwipe('up')}
+                  disabled={currentVideo === videos.length - 1}
+                  className={`w-6 h-6 rounded-full flex items-center justify-center transition-all ${currentVideo === videos.length - 1 ? 'bg-white/10 text-white/30' : 'bg-white/20 text-white hover:bg-white/30'}`}
+                >
+                  <ChevronDown size={14} />
+                </button>
+              </div>
+
+              {/* Video Counter */}
+              <div className="absolute left-2 top-1/2 -translate-y-1/2 flex flex-col gap-1 z-40">
+                {videos.map((_, i) => (
+                  <div
+                    key={i}
+                    className={`w-1 h-4 rounded-full transition-all ${i === currentVideo ? 'bg-white' : 'bg-white/30'}`}
+                  />
+                ))}
+              </div>
+
+              {/* Home Indicator */}
+              <div className="absolute bottom-1 inset-x-0 flex justify-center z-50">
+                <div className="w-20 h-1 bg-white/50 rounded-full"></div>
+              </div>
+            </div>
           </div>
         </div>
+
+        {/* 안내 텍스트 */}
+        <p className="text-center text-sm text-gray-500 mt-6">
+          {isPlaying ? `재생 중... ${videos[currentVideo].title}` : '화면을 탭하면 영상이 재생돼요'}
+        </p>
       </div>
     </section>
   );
 });
 
 // =====================================================
-// 인터랙티브 섹션 4: AI 챗봇
+// 인터랙티브 섹션 4: AI 챗봇 (폰 목업 + 음성 입력)
 // =====================================================
 const Section4Interactive = memo(function Section4Interactive() {
   const { ref, isInView } = useInView(0.3);
-  const [messages, setMessages] = useState([
-    { role: 'ai', text: '안녕하세요! 무엇을 도와드릴까요?' }
+  const [messages, setMessages] = useState<Array<{ role: string; text: string; isTyping?: boolean }>>([
+    { role: 'ai', text: '안녕하세요! 육아 고민이 있으시면 무엇이든 물어보세요.' }
   ]);
   const [inputValue, setInputValue] = useState('');
+  const [isRecording, setIsRecording] = useState(false);
+  const [currentTime, setCurrentTime] = useState('');
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const quickQuestions = ['밤에 자주 깨요', '수유량이 적어요', '이유식 시작 시기'];
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      setCurrentTime(`${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`);
+    };
+    updateTime();
+    const interval = setInterval(updateTime, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
-  const handleSend = (text: string) => {
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const quickQuestions = [
+    { text: '밤에 자주 깨요', response: '4개월 아기는 수면 퇴행기일 수 있어요. 규칙적인 수면 루틴을 만들어주세요. 잠들기 전 30분은 조용한 활동을 하면 도움이 됩니다.' },
+    { text: '수유량이 적어요', response: '신생아는 하루 8-12회 수유가 정상이에요. 아기가 활발하고 기저귀를 잘 적시면 걱정 안 하셔도 돼요.' },
+    { text: '이유식 시작 시기', response: '보통 생후 4-6개월에 시작해요. 목을 가눌 수 있고, 음식에 관심을 보이면 시작하기 좋은 시기입니다.' },
+  ];
+
+  const handleSend = (text: string, response?: string) => {
     if (!text.trim()) return;
     setMessages(prev => [...prev, { role: 'user', text }]);
     setInputValue('');
+
+    // AI typing indicator
     setTimeout(() => {
-      setMessages(prev => [...prev, {
-        role: 'ai',
-        text: '4개월 아기는 수면 퇴행기일 수 있어요. 규칙적인 수면 루틴과 편안한 환경을 만들어주세요.'
-      }]);
-    }, 1000);
+      setMessages(prev => [...prev, { role: 'ai', text: '', isTyping: true }]);
+    }, 300);
+
+    // AI response
+    setTimeout(() => {
+      setMessages(prev => {
+        const newMessages = prev.filter(m => !m.isTyping);
+        return [...newMessages, {
+          role: 'ai',
+          text: response || '좋은 질문이에요! 아기마다 다르지만, 보통은 자연스러운 발달 과정이에요. 걱정되시면 소아과 상담을 권해드려요.'
+        }];
+      });
+    }, 1500);
+  };
+
+  const handleVoiceRecord = () => {
+    if (isRecording) return;
+    setIsRecording(true);
+
+    setTimeout(() => {
+      setIsRecording(false);
+      handleSend('🎤 "아기가 열이 나는 것 같아요"', '체온이 38도 이상이면 해열제를 고려해보세요. 옷을 가볍게 입히고 수분 섭취를 늘려주세요. 고열이 지속되면 병원 방문을 권해드려요.');
+    }, 2000);
   };
 
   return (
@@ -894,6 +1090,7 @@ const Section4Interactive = memo(function Section4Interactive() {
       <PaperFlower color="#93C5FD" size={100} className="top-16 left-10 opacity-40" delay={0.3} />
       <PaperFlower color="#BFDBFE" size={70} className="bottom-10 right-20 opacity-30" delay={0.6} />
 
+      {/* 텍스트 영역 */}
       <div className={`flex-1 space-y-6 text-center md:text-left relative z-10 transition-all duration-700 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#EFF6FF] text-[#3B82F6] font-bold text-sm">
           <Bot size={16} /> AI 육아 도우미
@@ -902,68 +1099,166 @@ const Section4Interactive = memo(function Section4Interactive() {
           "밤에 자주 깨요"<br/><span className="text-crayon text-[#3B82F6] text-5xl md:text-6xl font-normal block mt-2">AI가 맞춤 답변을 드려요</span>
         </h2>
         <p className="text-lg text-gray-600 leading-relaxed max-w-lg mx-auto md:mx-0">
-          육아 고민이 생길 때마다 검색할 필요 없어요. AI 챗봇이 24시간 상담해드리고, 음성으로 편하게 기록할 수 있어요.
+          육아 고민이 생길 때마다 검색할 필요 없어요. AI 챗봇이 24시간 상담해드리고, 음성으로 편하게 질문할 수 있어요.
+        </p>
+        <p className="text-sm text-[#3B82F6] font-medium">
+          → 질문 버튼이나 마이크를 눌러보세요!
         </p>
       </div>
 
+      {/* 폰 영역 */}
       <div
-        className={`flex-1 w-full max-w-md md:max-w-none aspect-square bg-gradient-to-br from-[#EFF6FF] to-[#DBEAFE] rounded-[3rem] p-6 relative shadow-inner transition-all duration-700 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+        className={`flex-1 w-full max-w-md md:max-w-lg relative transition-all duration-700 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
         style={{ transitionDelay: '200ms' }}
       >
-        <div className="absolute inset-4 md:inset-8 bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col">
-          {/* Header */}
-          <div className="bg-[#3B82F6] p-3 flex items-center gap-2">
-            <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-              <Bot size={16} className="text-white" />
+        <div className="flex items-center justify-center">
+          {/* 챗봇 폰 */}
+          <div
+            className="relative w-[200px] h-[400px] md:w-[240px] md:h-[480px] rounded-[30px] md:rounded-[40px] border-[2px] overflow-hidden flex flex-col shrink-0"
+            style={{
+              background: 'white',
+              borderColor: '#E0D8D0',
+              boxShadow: '0 20px 50px rgba(59,130,246,0.2)',
+              transition: 'all 0.5s ease-out',
+            }}
+          >
+            {/* Notch */}
+            <div className="absolute top-0 inset-x-0 h-5 md:h-6 flex justify-center z-50">
+              <div className="w-20 md:w-24 h-4 md:h-5 rounded-b-xl md:rounded-b-2xl bg-[#E0D8D0] border-b border-x border-black/5 flex items-center justify-center gap-1">
+                <div className="w-1 h-1 rounded-full bg-black/40"></div>
+                <div className="w-5 h-0.5 rounded-full bg-black/40"></div>
+              </div>
             </div>
-            <div>
-              <p className="text-white text-sm font-bold">V.O.M AI</p>
-              <p className="text-white/70 text-[10px]">온라인</p>
-            </div>
-          </div>
 
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-3 space-y-2 bg-gray-50">
-            {messages.map((msg, i) => (
-              <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}>
-                <div className={`max-w-[85%] p-2 rounded-xl text-xs ${msg.role === 'user' ? 'bg-[#3B82F6] text-white' : 'bg-white text-gray-700 shadow-sm'}`}>
-                  {msg.text}
+            {/* Screen Content */}
+            <div className="absolute inset-0 bg-gray-50 flex flex-col font-warm pt-6">
+              {/* Status Bar */}
+              <div className="h-6 w-full flex items-center justify-between px-4 text-[8px] font-medium text-gray-600">
+                <span>{currentTime}</span>
+                <div className="flex items-center gap-1">
+                  <Wifi size={8} />
+                  <div className="w-3 h-2 rounded-sm border border-gray-600"></div>
                 </div>
               </div>
-            ))}
-          </div>
 
-          {/* Quick Questions */}
-          <div className="p-2 border-t border-gray-100 flex gap-1 overflow-x-auto">
-            {quickQuestions.map((q, i) => (
-              <button
-                key={i}
-                onClick={() => handleSend(q)}
-                className="px-2 py-1 bg-gray-100 rounded-full text-[10px] text-gray-600 whitespace-nowrap hover:bg-[#3B82F6] hover:text-white transition-colors"
-              >
-                {q}
-              </button>
-            ))}
-          </div>
+              {/* Chat Header */}
+              <div className="bg-[#3B82F6] px-3 py-2 flex items-center gap-2">
+                <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                  <Bot size={14} className="text-white" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-white text-[10px] font-bold">V.O.M AI 도우미</p>
+                  <div className="flex items-center gap-1">
+                    <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
+                    <p className="text-white/70 text-[8px]">온라인</p>
+                  </div>
+                </div>
+                <Volume2 size={14} className="text-white/70" />
+              </div>
 
-          {/* Input */}
-          <div className="p-2 border-t border-gray-100 flex gap-2">
-            <input
-              type="text"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSend(inputValue)}
-              placeholder="질문하세요..."
-              className="flex-1 px-3 py-2 bg-gray-100 rounded-full text-xs focus:outline-none"
-            />
-            <button
-              onClick={() => handleSend(inputValue)}
-              className="w-8 h-8 bg-[#3B82F6] rounded-full flex items-center justify-center hover:bg-[#2563EB] transition-colors"
-            >
-              <Send size={14} className="text-white" />
-            </button>
+              {/* Messages */}
+              <div className="flex-1 overflow-y-auto p-2 space-y-2">
+                {messages.map((msg, i) => (
+                  <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}>
+                    {msg.role === 'ai' && !msg.isTyping && (
+                      <div className="w-5 h-5 bg-[#3B82F6] rounded-full flex items-center justify-center mr-1 shrink-0">
+                        <Bot size={10} className="text-white" />
+                      </div>
+                    )}
+                    <div className={`max-w-[80%] p-2 rounded-xl text-[9px] leading-relaxed ${
+                      msg.role === 'user'
+                        ? 'bg-[#3B82F6] text-white rounded-tr-sm'
+                        : 'bg-white text-gray-700 shadow-sm rounded-tl-sm'
+                    }`}>
+                      {msg.isTyping ? (
+                        <div className="flex gap-1">
+                          <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                          <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                          <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                        </div>
+                      ) : msg.text}
+                    </div>
+                  </div>
+                ))}
+                <div ref={messagesEndRef} />
+              </div>
+
+              {/* Quick Questions */}
+              <div className="px-2 py-1.5 border-t border-gray-100 bg-white">
+                <p className="text-[7px] text-gray-400 mb-1">자주 묻는 질문</p>
+                <div className="flex gap-1 overflow-x-auto pb-1">
+                  {quickQuestions.map((q, i) => (
+                    <button
+                      key={i}
+                      onClick={() => handleSend(q.text, q.response)}
+                      className="px-2 py-1 bg-[#EFF6FF] rounded-full text-[8px] text-[#3B82F6] whitespace-nowrap hover:bg-[#3B82F6] hover:text-white transition-colors shrink-0"
+                    >
+                      {q.text}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Input Area */}
+              <div className="p-2 bg-white border-t border-gray-100 flex items-center gap-1.5">
+                <input
+                  type="text"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSend(inputValue)}
+                  placeholder="질문을 입력하세요..."
+                  className="flex-1 px-2 py-1.5 bg-gray-100 rounded-full text-[9px] focus:outline-none focus:ring-1 focus:ring-[#3B82F6]"
+                />
+                <button
+                  onClick={handleVoiceRecord}
+                  className={`w-7 h-7 rounded-full flex items-center justify-center transition-all ${
+                    isRecording ? 'bg-red-500 animate-pulse scale-110' : 'bg-[#3B82F6] hover:bg-[#2563EB]'
+                  }`}
+                >
+                  <Mic size={12} className="text-white" />
+                </button>
+                <button
+                  onClick={() => handleSend(inputValue)}
+                  className="w-7 h-7 bg-[#3B82F6] rounded-full flex items-center justify-center hover:bg-[#2563EB] transition-colors"
+                >
+                  <Send size={12} className="text-white" />
+                </button>
+              </div>
+
+              {/* Home Indicator */}
+              <div className="h-4 flex justify-center items-center bg-white">
+                <div className="w-16 h-1 bg-gray-300 rounded-full"></div>
+              </div>
+            </div>
+
+            {/* Recording Overlay */}
+            {isRecording && (
+              <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center z-50 animate-fade-in">
+                <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center animate-pulse mb-3">
+                  <Mic size={28} className="text-white" />
+                </div>
+                <p className="text-white text-xs font-medium">듣고 있어요...</p>
+                <div className="flex items-center gap-1 mt-2">
+                  {[...Array(5)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="w-1 bg-white rounded-full animate-pulse"
+                      style={{
+                        height: `${10 + Math.random() * 20}px`,
+                        animationDelay: `${i * 0.1}s`,
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
+
+        {/* 안내 텍스트 */}
+        <p className="text-center text-sm text-gray-500 mt-6">
+          {isRecording ? '음성을 인식하고 있어요...' : '질문 버튼을 누르거나 직접 입력해보세요'}
+        </p>
       </div>
     </section>
   );
