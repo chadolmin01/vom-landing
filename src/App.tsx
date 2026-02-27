@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, memo, useCallback } from 'react';
-import { Baby, Droplets, Moon, Sun, Clock, CheckCircle2, ChevronDown, Mic, Play, Sparkles, ArrowRight, Loader2, MessageCircle, X, Send, Bot, Volume2 } from 'lucide-react';
+import { Baby, Droplets, Moon, Sun, Clock, CheckCircle2, ChevronDown, Mic, Play, Sparkles, ArrowRight, Loader2, MessageCircle, X, Send, Bot, Volume2, Users, Wifi, Bell } from 'lucide-react';
 import { subscribeEmail } from './lib/supabase';
 
 // =====================================================
@@ -481,28 +481,72 @@ const Section1Interactive = memo(function Section1Interactive() {
 });
 
 // =====================================================
-// 인터랙티브 섹션 2: 음성 인식
+// 인터랙티브 섹션 2: 음성 인식 & 실시간 동기화 (듀얼 폰)
 // =====================================================
 const Section2Interactive = memo(function Section2Interactive() {
   const { ref, isInView } = useInView(0.3);
-  const [isRecording, setIsRecording] = useState(false);
-  const [showResponse, setShowResponse] = useState(false);
+  const [phase, setPhase] = useState<'idle' | 'recording' | 'typing' | 'response' | 'syncing' | 'synced'>('idle');
+  const [typedText, setTypedText] = useState('');
+  const [currentTime, setCurrentTime] = useState('');
+  const fullText = '"15분 먹였어"';
+
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      setCurrentTime(`${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`);
+    };
+    updateTime();
+    const interval = setInterval(updateTime, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleMicClick = () => {
-    if (isRecording) return;
-    setIsRecording(true);
-    setShowResponse(false);
+    if (phase !== 'idle') return;
+
+    // Phase 1: Recording
+    setPhase('recording');
+    setTypedText('');
+
+    // Phase 2: Typing (after 1.5s)
     setTimeout(() => {
-      setIsRecording(false);
-      setShowResponse(true);
-    }, 2000);
+      setPhase('typing');
+      let i = 0;
+      const typeInterval = setInterval(() => {
+        if (i < fullText.length) {
+          setTypedText(fullText.slice(0, i + 1));
+          i++;
+        } else {
+          clearInterval(typeInterval);
+          // Phase 3: AI Response (after typing done)
+          setTimeout(() => {
+            setPhase('response');
+            // Phase 4: Syncing to other device
+            setTimeout(() => {
+              setPhase('syncing');
+              // Phase 5: Synced
+              setTimeout(() => {
+                setPhase('synced');
+                // Reset after showing synced
+                setTimeout(() => {
+                  setPhase('idle');
+                  setTypedText('');
+                }, 3000);
+              }, 1000);
+            }, 800);
+          }, 500);
+        }
+      }, 80);
+    }, 1500);
   };
+
+  const isActive = phase !== 'idle';
 
   return (
     <section ref={ref} className="py-24 md:py-32 px-6 max-w-6xl mx-auto flex flex-col md:flex-row-reverse items-center gap-12 md:gap-20 relative overflow-hidden">
       <PaperFlower color="#A8F0EA" size={100} className="top-16 left-10 opacity-40" delay={0.3} />
       <PaperFlower color="#C4F5F1" size={70} className="bottom-10 right-20 opacity-30" delay={0.6} />
 
+      {/* 텍스트 영역 */}
       <div className={`flex-1 space-y-6 text-center md:text-left relative z-10 transition-all duration-700 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#E6F4F1] text-[#4A8B86] font-bold text-sm">
           <Mic size={16} /> 음성 인식 & 실시간 동기화
@@ -513,43 +557,234 @@ const Section2Interactive = memo(function Section2Interactive() {
         <p className="text-lg text-gray-600 leading-relaxed max-w-lg mx-auto md:mx-0">
           손이 바쁠 땐 그냥 말하세요. 기록은 클라우드에 자동 저장되고, 가족 모두가 실시간으로 아기 상태를 함께 확인할 수 있어요.
         </p>
+        <p className="text-sm text-[#4A8B86] font-medium">
+          → 마이크 버튼을 클릭해서 체험해보세요!
+        </p>
       </div>
 
+      {/* 듀얼 폰 영역 */}
       <div
-        className={`flex-1 w-full max-w-md md:max-w-none aspect-square bg-gradient-to-br from-[#E6F4F1] to-[#D1EBE6] rounded-[3rem] p-8 relative shadow-inner transition-all duration-700 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+        className={`flex-1 w-full max-w-md md:max-w-lg relative transition-all duration-700 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
         style={{ transitionDelay: '200ms' }}
       >
-        <div className="absolute inset-0 flex items-center justify-center flex-col gap-4">
-          <div className="w-64 bg-white rounded-full shadow-xl flex items-center px-6 gap-4 relative z-10 h-20">
-            <button
-              onClick={handleMicClick}
-              className={`w-14 h-14 rounded-full flex items-center justify-center text-white transition-all ${isRecording ? 'bg-red-500 animate-pulse scale-110' : 'bg-[#4A8B86] hover:bg-[#3A706C] hover:scale-105'}`}
-            >
-              <Mic size={28} />
-            </button>
-            <div className="flex-1">
-              {isRecording ? (
-                <div className="flex items-center gap-1">
-                  {[...Array(5)].map((_, i) => (
-                    <div key={i} className="w-1 bg-[#4A8B86] rounded-full animate-pulse" style={{ height: `${12 + Math.random() * 20}px`, animationDelay: `${i * 0.1}s` }} />
-                  ))}
-                  <span className="ml-2 text-sm text-gray-500">듣고 있어요...</span>
-                </div>
-              ) : showResponse ? (
-                <p className="text-sm text-[#4A8B86] font-medium">"수유 15분 기록했어요!"</p>
-              ) : (
-                <p className="text-sm text-gray-400">탭해서 말하세요</p>
-              )}
-            </div>
-          </div>
-          {showResponse && (
-            <div className="bg-white rounded-2xl shadow-lg p-4 animate-fade-in">
-              <div className="flex items-center gap-2 text-green-500">
-                <CheckCircle2 size={20} />
-                <span className="font-medium">기록 완료!</span>
+        <div className="flex items-end justify-center gap-3 md:gap-6">
+          {/* 메인 폰 (엄마) */}
+          <div
+            className="relative w-[160px] h-[320px] md:w-[200px] md:h-[400px] rounded-[25px] md:rounded-[35px] border-[2px] overflow-hidden flex flex-col shrink-0"
+            style={{
+              background: 'white',
+              borderColor: '#E0D8D0',
+              boxShadow: isActive
+                ? '0 20px 50px rgba(74,139,134,0.3)'
+                : '0 15px 40px rgba(0,0,0,0.15)',
+              transform: isActive ? 'scale(1.02)' : 'scale(1)',
+              transition: 'all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)',
+            }}
+          >
+            {/* Notch */}
+            <div className="absolute top-0 inset-x-0 h-4 md:h-5 flex justify-center z-40">
+              <div className="w-16 md:w-20 h-3 md:h-4 rounded-b-lg md:rounded-b-xl bg-[#E0D8D0] border-b border-x border-black/5 flex items-center justify-center gap-1">
+                <div className="w-1 h-1 rounded-full bg-black/40"></div>
+                <div className="w-4 h-0.5 rounded-full bg-black/40"></div>
               </div>
             </div>
-          )}
+
+            {/* 화면 내용 */}
+            <div className="absolute inset-0 bg-[#FAFDFF] flex flex-col font-warm pt-5">
+              {/* Status Bar */}
+              <div className="h-6 w-full flex items-center justify-between px-3 text-[8px] font-medium text-gray-800">
+                <span>{currentTime}</span>
+                <div className="flex items-center gap-1">
+                  <Wifi size={8} />
+                  <div className="w-3 h-2 rounded-sm border border-gray-800 relative">
+                    <div className="absolute inset-0.5 bg-gray-800 rounded-[1px]"></div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Header */}
+              <div className="px-3 py-2 bg-gradient-to-b from-[#E6F4F1] to-[#FAFDFF]">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[#5B9E99] font-medium text-[8px] flex items-center gap-0.5">
+                    <Users size={8}/> 엄마
+                  </span>
+                  <div className="w-4 h-4 rounded-full bg-[#4A8B86] flex items-center justify-center text-white text-[6px] font-bold">엄</div>
+                </div>
+                <h2 className="text-crayon text-[#4A8B86] text-sm md:text-base leading-tight">음성 기록</h2>
+              </div>
+
+              {/* Voice Recording UI */}
+              <div className="flex-1 px-3 py-2 flex flex-col gap-2">
+                {/* Mic Button */}
+                <div className="bg-white rounded-xl p-3 shadow-sm border border-[#E6F4F1] flex flex-col items-center">
+                  <button
+                    onClick={handleMicClick}
+                    disabled={phase !== 'idle'}
+                    className={`w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-white transition-all mb-2 ${
+                      phase === 'recording' ? 'bg-red-500 animate-pulse scale-110' : 'bg-[#4A8B86] hover:bg-[#3A706C]'
+                    } ${phase !== 'idle' && phase !== 'recording' ? 'opacity-50' : ''}`}
+                  >
+                    <Mic size={20} />
+                  </button>
+
+                  {/* Waveform */}
+                  {phase === 'recording' && (
+                    <div className="flex items-center justify-center gap-0.5 h-6">
+                      {[...Array(7)].map((_, i) => (
+                        <div
+                          key={i}
+                          className="w-1 bg-[#4A8B86] rounded-full animate-pulse"
+                          style={{
+                            height: `${8 + Math.sin(i * 0.8) * 12}px`,
+                            animationDelay: `${i * 0.1}s`,
+                          }}
+                        />
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Typed Text */}
+                  {(phase === 'typing' || phase === 'response' || phase === 'syncing' || phase === 'synced') && (
+                    <div className="text-center">
+                      <p className="text-[10px] text-gray-800 font-medium">{typedText}<span className={phase === 'typing' ? 'animate-pulse' : ''}>|</span></p>
+                    </div>
+                  )}
+
+                  {phase === 'idle' && (
+                    <p className="text-[8px] text-gray-400">탭해서 말하세요</p>
+                  )}
+                </div>
+
+                {/* AI Response */}
+                {(phase === 'response' || phase === 'syncing' || phase === 'synced') && (
+                  <div className="bg-gradient-to-r from-[#4A8B86] to-[#5B9E99] rounded-xl p-2 animate-fade-in">
+                    <div className="flex items-start gap-2">
+                      <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                        <Bot size={10} className="text-white" />
+                      </div>
+                      <p className="text-white text-[8px] leading-relaxed">
+                        "네, 수유 15분 기록했어요! 오늘 총 수유 시간은 45분이에요."
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Sync Status */}
+                {(phase === 'syncing' || phase === 'synced') && (
+                  <div className={`flex items-center justify-center gap-1 text-[8px] ${phase === 'synced' ? 'text-green-600' : 'text-[#4A8B86]'} animate-fade-in`}>
+                    {phase === 'syncing' ? (
+                      <>
+                        <Loader2 size={10} className="animate-spin" />
+                        <span>가족에게 동기화 중...</span>
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle2 size={10} />
+                        <span>동기화 완료!</span>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Home Indicator */}
+              <div className="h-4 flex justify-center items-center">
+                <div className="w-12 h-1 bg-gray-300 rounded-full"></div>
+              </div>
+            </div>
+          </div>
+
+          {/* 서브 폰 (아빠/할머니) */}
+          <div
+            className="relative w-[100px] h-[200px] md:w-[120px] md:h-[240px] rounded-[18px] md:rounded-[24px] border-[2px] overflow-hidden flex flex-col shrink-0"
+            style={{
+              background: 'white',
+              borderColor: '#ddd',
+              boxShadow: (phase === 'syncing' || phase === 'synced')
+                ? '0 15px 40px rgba(74,139,134,0.25)'
+                : '0 10px 30px rgba(0,0,0,0.1)',
+              transform: (phase === 'syncing' || phase === 'synced') ? 'scale(1.03)' : 'scale(1)',
+              transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
+            }}
+          >
+            {/* Notch */}
+            <div className="absolute top-0 inset-x-0 h-3 flex justify-center z-40">
+              <div className="w-10 h-2 rounded-b-md bg-gray-200 border-b border-x border-black/5"></div>
+            </div>
+
+            {/* 화면 내용 */}
+            <div className="absolute inset-0 bg-gray-50 flex flex-col font-warm pt-3">
+              {/* Status Bar */}
+              <div className="h-4 w-full flex items-center justify-between px-2 text-[6px] font-medium text-gray-600">
+                <span>{currentTime}</span>
+                <div className="w-2 h-1.5 rounded-sm border border-gray-600"></div>
+              </div>
+
+              {/* Header */}
+              <div className="px-2 py-1">
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 rounded-full bg-[#C26D53] flex items-center justify-center text-white text-[5px] font-bold">아</div>
+                  <span className="text-[6px] text-gray-600">아빠</span>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="flex-1 px-2 py-1 flex flex-col gap-1">
+                {/* Normal state - 기존 기록들 */}
+                <div className="bg-white rounded-lg p-1.5 shadow-sm border border-gray-100">
+                  <div className="flex items-center gap-1 mb-1">
+                    <Droplets size={8} className="text-[#C26D53]" />
+                    <span className="text-[6px] text-gray-600">09:30 수유</span>
+                  </div>
+                  <p className="text-[5px] text-gray-400">30분 완료</p>
+                </div>
+
+                {/* Sync Notification */}
+                {(phase === 'syncing' || phase === 'synced') && (
+                  <div
+                    className={`bg-[#4A8B86] rounded-lg p-1.5 animate-fade-in ${phase === 'syncing' ? 'animate-pulse' : ''}`}
+                  >
+                    <div className="flex items-center gap-1 mb-0.5">
+                      <Bell size={7} className="text-white" />
+                      <span className="text-[6px] text-white font-bold">새 기록!</span>
+                    </div>
+                    <p className="text-[5px] text-white/80">엄마가 수유 15분 기록</p>
+                    {phase === 'synced' && (
+                      <div className="flex items-center gap-0.5 mt-1">
+                        <CheckCircle2 size={6} className="text-white" />
+                        <span className="text-[5px] text-white">동기화됨</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Sync indicator */}
+                {phase !== 'idle' && phase !== 'syncing' && phase !== 'synced' && (
+                  <div className="flex items-center justify-center gap-0.5 text-[5px] text-gray-400 mt-auto">
+                    <Wifi size={6} />
+                    <span>대기 중</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Home Indicator */}
+              <div className="h-3 flex justify-center items-center">
+                <div className="w-8 h-0.5 bg-gray-300 rounded-full"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 안내 텍스트 */}
+        <div className="text-center mt-6">
+          <p className="text-sm text-gray-500">
+            {phase === 'idle' && '마이크를 클릭하면 음성 인식이 시작돼요'}
+            {phase === 'recording' && '말하는 중...'}
+            {phase === 'typing' && '음성을 텍스트로 변환 중...'}
+            {phase === 'response' && 'AI가 기록을 정리했어요'}
+            {phase === 'syncing' && '가족 기기에 동기화 중...'}
+            {phase === 'synced' && '모든 가족이 기록을 볼 수 있어요!'}
+          </p>
         </div>
       </div>
     </section>
