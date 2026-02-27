@@ -82,27 +82,34 @@
     50% { transform: translateY(-12px) rotate(calc(var(--tw-rotate, 0deg) + 2deg)); }
   }
   
+  /* 성능 최적화: filter:blur() 제거 */
   @keyframes paper-bloom {
     0% {
       transform: rotate(var(--petal-angle)) rotateX(-85deg) scale(0.1);
       opacity: 0;
-      filter: blur(5px);
     }
     15% {
       opacity: 0.8;
-      filter: blur(2px);
     }
     100% {
       transform: rotate(var(--petal-angle)) rotateX(0deg) scale(1);
       opacity: 0.95;
-      filter: blur(0px);
     }
   }
 
   @keyframes paper-core {
-    0% { transform: scale(0) rotate(-180deg); opacity: 0; filter: blur(5px); }
-    100% { transform: scale(1) rotate(0deg); opacity: 1; filter: blur(0px); }
+    0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
   }
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out forwards;
 }
 
 .bg-noise {
