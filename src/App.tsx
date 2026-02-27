@@ -1031,7 +1031,7 @@ const Section4Interactive = memo(function Section4Interactive() {
   const [inputValue, setInputValue] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [currentTime, setCurrentTime] = useState('');
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const updateTime = () => {
@@ -1044,7 +1044,10 @@ const Section4Interactive = memo(function Section4Interactive() {
   }, []);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    // 채팅 컨테이너 내부만 스크롤 (페이지 전체 X)
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    }
   }, [messages]);
 
   const quickQuestions = [
@@ -1157,7 +1160,7 @@ const Section4Interactive = memo(function Section4Interactive() {
               </div>
 
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-2 space-y-2">
+              <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-2 space-y-2">
                 {messages.map((msg, i) => (
                   <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}>
                     {msg.role === 'ai' && !msg.isTyping && (
@@ -1180,7 +1183,6 @@ const Section4Interactive = memo(function Section4Interactive() {
                     </div>
                   </div>
                 ))}
-                <div ref={messagesEndRef} />
               </div>
 
               {/* Quick Questions */}
