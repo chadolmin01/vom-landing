@@ -1865,66 +1865,6 @@ export default function App() {
         <Section3Interactive />
         <Section4Interactive />
 
-        {/* VOM Kit Section - Compact */}
-        <section className="py-12 md:py-16 px-6 bg-gradient-to-r from-[#FFF8F0] to-[#F0F9F8] relative overflow-hidden">
-          <div className="max-w-5xl mx-auto">
-            <div className="flex flex-col md:flex-row items-center gap-6 md:gap-10">
-              {/* Left: Package Visual */}
-              <div className="relative w-[180px] h-[200px] md:w-[220px] md:h-[240px] shrink-0">
-                <div className="absolute inset-0 bg-gradient-to-br from-[#F5E6E1] to-[#E8D5CE] rounded-2xl shadow-lg transform rotate-[-3deg]"></div>
-                <div className="absolute inset-0 bg-gradient-to-br from-[#FFFAF8] to-[#FFF0E6] rounded-2xl shadow-md border-2 border-[#F5E6E1] p-4 flex flex-col items-center justify-center">
-                  <div className="text-lg md:text-xl font-bold text-[#C26D53] tracking-wider mb-1">V.O.M Kit</div>
-                  <div className="text-[9px] text-[#D48B71] mb-3">Voice of Mother</div>
-                  {/* Mini Cards */}
-                  <div className="flex gap-1">
-                    <div className="w-9 h-12 bg-gradient-to-br from-[#FFB6B6] to-[#FF8E8E] rounded-md shadow flex items-center justify-center transform -rotate-6">
-                      <Droplets size={12} className="text-white" />
-                    </div>
-                    <div className="w-9 h-12 bg-gradient-to-br from-[#A8F0EA] to-[#5B9E99] rounded-md shadow flex items-center justify-center">
-                      <Baby size={12} className="text-white" />
-                    </div>
-                    <div className="w-9 h-12 bg-gradient-to-br from-[#E9D5FF] to-[#8B5CF6] rounded-md shadow flex items-center justify-center transform rotate-6">
-                      <Moon size={12} className="text-white" />
-                    </div>
-                  </div>
-                  {/* Ribbon */}
-                  <div className="absolute -right-2 top-3 px-2 py-1 bg-[#C26D53] rounded-l-md shadow text-white text-[7px] font-bold">
-                    NEW
-                  </div>
-                </div>
-              </div>
-
-              {/* Right: Info */}
-              <div className="flex-1 text-center md:text-left">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFF0E6] text-[#C26D53] font-bold text-xs mb-2">
-                  <Gift size={12} /> Coming Soon
-                </div>
-                <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-1">
-                  육아의 시작을 함께해요
-                </h2>
-                <p className="text-gray-600 text-sm mb-3 max-w-sm">
-                  NFC 카드, 마스터 카드, 냉장고 패널까지 한 박스에.
-                </p>
-
-                {/* Compact Item Tags */}
-                <div className="flex flex-wrap gap-1.5 justify-center md:justify-start mb-4">
-                  {['📦 패키지', '💌 웰컴카드', '🪪 마스터카드', '💳 NFC x3', '🧲 냉장고패널'].map((item, i) => (
-                    <span key={i} className="px-2 py-1 bg-white rounded-full text-[11px] text-gray-600 shadow-sm border border-gray-100">
-                      {item}
-                    </span>
-                  ))}
-                </div>
-
-                {/* CTA */}
-                <button className="px-5 py-2.5 bg-gradient-to-r from-[#C26D53] to-[#D48B71] text-white rounded-full font-bold text-sm shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all inline-flex items-center gap-2">
-                  <Bell size={16} />
-                  출시 알림 받기
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* CTA Section */}
         <section className="py-32 px-6 bg-white relative overflow-hidden rounded-t-[4rem] shadow-[0_-20px_50px_rgba(0,0,0,0.02)]">
           <PaperFlower color="#FFB6B6" size={150} className="top-20 left-10 opacity-30" delay={0.2} />
