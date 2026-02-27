@@ -263,16 +263,39 @@ const ChatWidget = memo(function ChatWidget({ isVisible }: { isVisible: boolean 
 });
 
 // =====================================================
-// 인터랙티브 섹션 1: 직관적인 기록
+// 인터랙티브 섹션 1: 직관적인 기록 (핸드폰 목업 + 카드 태깅)
 // =====================================================
 const Section1Interactive = memo(function Section1Interactive() {
   const { ref, isInView } = useInView(0.3);
+  const [screenOn, setScreenOn] = useState(false);
   const [isTagging, setIsTagging] = useState(false);
+  const [currentTime, setCurrentTime] = useState('');
+
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      setCurrentTime(`${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`);
+    };
+    updateTime();
+    const interval = setInterval(updateTime, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleTagDemo = () => {
     if (isTagging) return;
     setIsTagging(true);
-    setTimeout(() => setIsTagging(false), 1500);
+
+    setTimeout(() => {
+      setScreenOn(true);
+    }, 600);
+
+    setTimeout(() => {
+      setIsTagging(false);
+    }, 1500);
+  };
+
+  const handleScreenOff = () => {
+    setScreenOn(false);
   };
 
   return (
@@ -280,6 +303,7 @@ const Section1Interactive = memo(function Section1Interactive() {
       <PaperFlower color="#FFB6B6" size={120} className="top-10 right-10 opacity-40" delay={0.2} />
       <PaperFlower color="#FFCACA" size={80} className="bottom-20 left-5 opacity-30" delay={0.5} />
 
+      {/* 텍스트 영역 */}
       <div className={`flex-1 space-y-6 text-center md:text-left relative z-10 transition-all duration-700 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#FFF0E6] text-[#C26D53] font-bold text-sm">
           <Sparkles size={16} /> 직관적인 기록
@@ -290,34 +314,167 @@ const Section1Interactive = memo(function Section1Interactive() {
         <p className="text-lg text-gray-600 leading-relaxed max-w-lg mx-auto md:mx-0">
           바쁜 육아 중에도 스마트폰에 카드를 갖다 대기만 하세요. 수유, 기저귀, 수면 등 필요한 기록 화면이 즉시 나타납니다.
         </p>
-        <button
-          onClick={handleTagDemo}
-          className="inline-flex items-center gap-2 px-6 py-3 bg-[#C26D53] text-white rounded-full font-bold hover:bg-[#A85B43] transition-all hover:-translate-y-1"
-        >
-          태그 체험하기 <ArrowRight size={18} />
-        </button>
+        <p className="text-sm text-[#C26D53] font-medium">
+          → 카드를 클릭해서 체험해보세요!
+        </p>
       </div>
 
+      {/* 핸드폰 + 카드 영역 */}
       <div
-        className={`flex-1 w-full max-w-md md:max-w-none aspect-square bg-gradient-to-br from-[#FFF0E6] to-[#FFE4D6] rounded-[3rem] p-8 relative shadow-inner cursor-pointer transition-all duration-700 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+        className={`flex-1 w-full max-w-md md:max-w-lg relative transition-all duration-700 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
         style={{ transitionDelay: '200ms' }}
-        onClick={handleTagDemo}
       >
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-48 h-64 bg-white rounded-3xl shadow-xl border-8 border-gray-100 flex items-center justify-center relative z-10 transition-all duration-500" style={{ transform: isTagging ? 'scale(1.05)' : 'scale(1)', boxShadow: isTagging ? '0 20px 50px rgba(194,109,83,0.3)' : '' }}>
+        <div className="flex items-center justify-center gap-4 md:gap-8">
+          {/* 핸드폰 프레임 */}
+          <div
+            className="relative w-[180px] h-[360px] md:w-[220px] md:h-[440px] rounded-[30px] md:rounded-[40px] border-[2px] overflow-hidden flex flex-col shrink-0"
+            style={{
+              background: screenOn ? 'white' : '#111',
+              borderColor: screenOn ? '#E0D8D0' : '#333',
+              boxShadow: screenOn
+                ? '0 20px 50px rgba(194,109,83,0.25)'
+                : '0 20px 50px rgba(0,0,0,0.4)',
+              transform: screenOn ? 'scale(1.02)' : 'scale(1)',
+              transition: 'all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)',
+            }}
+          >
+            {/* Notch */}
+            <div className="absolute top-0 inset-x-0 h-5 md:h-6 flex justify-center z-40">
+              <div
+                className="w-20 md:w-24 h-4 md:h-5 rounded-b-xl md:rounded-b-2xl border-b border-x flex items-center justify-center gap-1"
+                style={{
+                  background: screenOn ? '#E0D8D0' : '#050505',
+                  borderColor: screenOn ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)',
+                  transition: 'all 0.6s ease-out',
+                }}
+              >
+                <div className="w-1 h-1 rounded-full bg-black/50"></div>
+                <div className="w-6 h-1 rounded-full bg-black/50"></div>
+              </div>
+            </div>
+
+            {/* OFF 화면 */}
             <div
-              className={`w-32 h-40 bg-gradient-to-br from-[#FF8E8E] to-[#FF6B6B] rounded-xl shadow-lg absolute flex items-center justify-center text-white transition-all duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${isTagging ? '-right-4 -top-4 rotate-0' : '-right-12 -top-8 rotate-12'}`}
+              className="absolute inset-0 bg-black flex flex-col items-center justify-center"
+              style={{
+                opacity: screenOn ? 0 : 1,
+                transition: 'opacity 0.6s ease-out',
+              }}
             >
-              <Droplets size={40} />
+              <div className="text-white/20 text-3xl md:text-4xl font-light tracking-widest font-mono">{currentTime || '03:15'}</div>
+              <div className="mt-4 w-8 h-0.5 bg-white/10 rounded-full"></div>
             </div>
-            <div className={`transition-all duration-500 ${isTagging ? 'opacity-100' : 'opacity-0'}`}>
-              <CheckCircle2 size={48} className="text-green-500" />
+
+            {/* ON 화면 - 수유 기록 UI */}
+            <div
+              className="absolute inset-0 bg-[#FFFDFB] flex flex-col font-warm"
+              style={{
+                opacity: screenOn ? 1 : 0,
+                transition: 'opacity 0.6s ease-out',
+              }}
+            >
+              {/* Status Bar */}
+              <div className="h-8 w-full flex items-center justify-between px-4 pt-1 text-[8px] md:text-[10px] font-medium text-gray-800 z-40">
+                <span>{currentTime}</span>
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-2 rounded-sm border border-gray-800 relative">
+                    <div className="absolute inset-0.5 bg-gray-800 rounded-[1px]"></div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Header */}
+              <div className="pt-1 pb-3 px-4 bg-gradient-to-b from-[#FFF0E6] to-[#FFFDFB]">
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-[#D48B71] font-medium text-[10px] flex items-center gap-1"><Moon size={10}/> 새벽 수유</span>
+                  <div className="w-5 h-5 rounded-full bg-white/50 flex items-center justify-center text-[#C26D53] font-bold shadow-sm text-[8px]">지안</div>
+                </div>
+                <h2 className="text-crayon text-[#C26D53] text-lg md:text-xl leading-tight">우리아이<br/>맘마 먹을 시간</h2>
+              </div>
+
+              {/* Content */}
+              <div className="flex-1 px-4 flex flex-col gap-2 overflow-hidden pb-2">
+                <div className="bg-white rounded-xl p-3 shadow-sm border border-[#F5E6E1]">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-6 h-6 rounded-full bg-[#FFF0E6] flex items-center justify-center text-[#C26D53]">
+                      <Droplets size={12} />
+                    </div>
+                    <div>
+                      <h3 className="text-gray-800 font-bold text-[10px]">모유 수유</h3>
+                      <p className="text-gray-400 text-[8px]">마지막: 3시간 전</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <button className="flex-1 py-2 rounded-lg bg-[#FFF0E6] text-[#C26D53] font-bold text-[10px]">
+                      왼쪽 15분
+                    </button>
+                    <button className="flex-1 py-2 rounded-lg bg-gray-50 text-gray-400 font-bold text-[10px]">
+                      오른쪽 --
+                    </button>
+                  </div>
+                </div>
+
+                {/* AI 버튼 */}
+                <div className="bg-gradient-to-r from-[#C26D53] to-[#D48B71] rounded-xl p-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                      <Mic size={14} className="text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-white font-bold text-[10px]">음성으로 기록</h3>
+                      <p className="text-white/70 text-[8px]">탭해서 말하세요</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Button */}
+              <div className="p-3 bg-white border-t border-gray-100">
+                <button
+                  onClick={handleScreenOff}
+                  className="w-full py-2 bg-[#C26D53] text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1"
+                >
+                  <CheckCircle2 size={12} /> 저장하기
+                </button>
+              </div>
+
+              {/* Home Indicator */}
+              <div className="h-4 flex justify-center items-center">
+                <div className="w-16 h-1 bg-gray-300 rounded-full"></div>
+              </div>
             </div>
-            <div className={`w-24 h-2 bg-gray-100 rounded-full absolute bottom-8 transition-all duration-300 ${isTagging ? 'bg-[#C26D53]' : ''}`}></div>
-            <div className={`w-16 h-2 bg-gray-100 rounded-full absolute bottom-12 transition-all duration-300 ${isTagging ? 'bg-[#FFE4D6]' : ''}`}></div>
+          </div>
+
+          {/* 폴라로이드 카드 */}
+          <div
+            onClick={handleTagDemo}
+            className={`w-24 h-32 md:w-28 md:h-36 bg-white rounded-sm shadow-[0_10px_30px_rgba(0,0,0,0.2)] border border-gray-200 flex flex-col p-2 cursor-pointer transition-all duration-[800ms] ease-[cubic-bezier(0.34,1.56,0.64,1)]
+              ${isTagging
+                ? '-translate-x-[60px] md:-translate-x-[80px] rotate-[-5deg] scale-105'
+                : 'hover:scale-105 hover:-translate-y-1 hover:rotate-[-5deg] rotate-[8deg]'}
+            `}
+            style={{
+              zIndex: isTagging ? 50 : 10,
+            }}
+          >
+            <div className="w-full aspect-square bg-gray-100 mb-1.5 overflow-hidden">
+              <img
+                src="https://images.unsplash.com/photo-1555252333-9f8e92e65df9?auto=format&fit=crop&w=400&q=80"
+                alt="Feeding"
+                className="w-full h-full object-cover"
+                referrerPolicy="no-referrer"
+              />
+            </div>
+            <div className="flex-1 flex items-center justify-center">
+              <span className="text-crayon text-gray-800 text-lg md:text-xl tracking-widest">수유</span>
+            </div>
           </div>
         </div>
-        <p className="absolute bottom-4 left-0 right-0 text-center text-sm text-[#C26D53] font-medium">클릭해서 체험해보세요!</p>
+
+        {/* 안내 텍스트 */}
+        <p className="text-center text-sm text-gray-500 mt-6">
+          {screenOn ? '저장하기를 눌러 화면을 끄세요' : '카드를 클릭하면 화면이 켜져요'}
+        </p>
       </div>
     </section>
   );
