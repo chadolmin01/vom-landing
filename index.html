@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>V.O.M - Voice of Mother</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Primary Meta Tags -->
+    <meta name="title" content="V.O.M - Voice of Mother" />
+    <meta name="description" content="복잡한 과정 없이, 태그 한 번으로 육아를 기록하세요. 모든 엄마를 위한 음성 기반 육아 도우미." />
+    <meta name="keywords" content="육아, 육아기록, 음성기록, 엄마, 아기, 수유, 기저귀, VOM, Voice of Mother" />
+    <meta name="author" content="V.O.M Team" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="V.O.M - Voice of Mother" />
+    <meta property="og:description" content="복잡한 과정 없이, 태그 한 번으로 육아를 기록하세요. 모든 엄마를 위한 음성 기반 육아 도우미." />
+    <meta property="og:image" content="/og-image.png" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:title" content="V.O.M - Voice of Mother" />
+    <meta property="twitter:description" content="복잡한 과정 없이, 태그 한 번으로 육아를 기록하세요. 모든 엄마를 위한 음성 기반 육아 도우미." />
+    <meta property="twitter:image" content="/og-image.png" />
+
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#C26D53" />
+  </head>
+  <body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" style="
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #FFFDFB 0%, #FFF0E6 100%);
+      transition: opacity 0.5s ease-out;
+    ">
+      <div style="
+        font-family: system-ui, sans-serif;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #C26D53;
+        animation: pulse 1.5s ease-in-out infinite;
+      ">V.O.M</div>
+      <div style="
+        font-family: system-ui, sans-serif;
+        font-size: 0.875rem;
+        color: #A85B43;
+        margin-top: 0.5rem;
+        opacity: 0.8;
+      ">Voice of Mother</div>
+      <div style="
+        margin-top: 2rem;
+        width: 40px;
+        height: 40px;
+        border: 3px solid #FFE4D6;
+        border-top-color: #C26D53;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      "></div>
+    </div>
+    <style>
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.05); opacity: 0.8; }
+      }
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+    </style>
+
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+
+    <script>
+      // Hide loading screen when React app is ready
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          var loader = document.getElementById('loading-screen');
+          if (loader) {
+            loader.style.opacity = '0';
+            setTimeout(function() {
+              loader.style.display = 'none';
+            }, 500);
+          }
+        }, 300);
+      });
+    </script>
+  </body>
+</html>
+
