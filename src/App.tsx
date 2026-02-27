@@ -1865,124 +1865,61 @@ export default function App() {
         <Section3Interactive />
         <Section4Interactive />
 
-        {/* VOM Kit Section */}
-        <section className="py-24 md:py-32 px-6 bg-gradient-to-b from-[#FFFDF5] to-[#FFF8F0] relative overflow-hidden">
-          <PaperFlower color="#FFD6D6" size={100} className="top-20 right-10 opacity-30" delay={0.3} />
-          <PaperFlower color="#D6F8F5" size={80} className="bottom-20 left-16 opacity-25" delay={0.6} />
-
-          <div className="max-w-6xl mx-auto">
-            {/* Header */}
-            <div className="text-center mb-12 md:mb-16">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#FFF0E6] text-[#C26D53] font-bold text-sm mb-6">
-                <Gift size={16} /> Coming Soon
-              </div>
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-4">
-                V.O.M Kit
-              </h2>
-              <p className="text-crayon text-[#C26D53] text-3xl md:text-4xl mb-6">
-                육아의 시작을 함께해요
-              </p>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                처음 육아를 시작하는 부모님을 위한 스타터 키트. 필요한 모든 것이 한 박스에 담겨있어요.
-              </p>
-            </div>
-
-            {/* Kit Visual */}
-            <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-16">
-              {/* Package Mockup */}
-              <div className="relative w-[280px] h-[320px] md:w-[340px] md:h-[380px]">
-                {/* Box Background */}
-                <div className="absolute inset-0 bg-gradient-to-br from-[#F5E6E1] to-[#E8D5CE] rounded-3xl shadow-2xl transform rotate-[-3deg]"></div>
-                <div className="absolute inset-0 bg-gradient-to-br from-[#FFFAF8] to-[#FFF0E6] rounded-3xl shadow-xl border-2 border-[#F5E6E1] p-6 flex flex-col">
-                  {/* Box Flap */}
-                  <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-3/4 h-8 bg-gradient-to-b from-[#E8D5CE] to-[#F5E6E1] rounded-t-xl border-x-2 border-t-2 border-[#DDD0C8]"></div>
-
-                  {/* Box Content Preview */}
-                  <div className="flex-1 flex flex-col items-center justify-center gap-3 pt-4">
-                    {/* VOM Logo */}
-                    <div className="text-2xl md:text-3xl font-bold text-[#C26D53] tracking-wider">V.O.M</div>
-                    <div className="text-xs text-[#D48B71]">Voice of Mother</div>
-
-                    {/* Items Stack */}
-                    <div className="relative w-full h-40 mt-4">
-                      {/* Envelope */}
-                      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-20 bg-white rounded-lg shadow-md border border-gray-100 flex items-center justify-center transform -rotate-3 z-10">
-                        <div className="text-center">
-                          <Mail size={20} className="text-[#C26D53] mx-auto mb-1" />
-                          <span className="text-[8px] text-gray-500">Thank You Card</span>
-                        </div>
-                      </div>
-
-                      {/* Master Card */}
-                      <div className="absolute top-8 left-1/2 -translate-x-1/2 w-36 h-22 bg-gradient-to-br from-[#4A8B86] to-[#3A706C] rounded-xl shadow-lg flex items-center justify-center p-2 transform rotate-2 z-20">
-                        <div className="w-full h-full border border-white/30 rounded-lg flex flex-col items-center justify-center">
-                          <span className="text-white text-[10px] font-bold">MASTER CARD</span>
-                          <span className="text-white/70 text-[7px]">학생증 스타일</span>
-                        </div>
-                      </div>
-
-                      {/* NFC Cards */}
-                      <div className="absolute top-20 left-1/2 -translate-x-1/2 flex gap-1 z-30">
-                        <div className="w-12 h-16 bg-gradient-to-br from-[#FFB6B6] to-[#FF8E8E] rounded-lg shadow-md flex items-center justify-center transform -rotate-6">
-                          <Droplets size={16} className="text-white" />
-                        </div>
-                        <div className="w-12 h-16 bg-gradient-to-br from-[#A8F0EA] to-[#5B9E99] rounded-lg shadow-md flex items-center justify-center transform rotate-3">
-                          <Baby size={16} className="text-white" />
-                        </div>
-                        <div className="w-12 h-16 bg-gradient-to-br from-[#E9D5FF] to-[#8B5CF6] rounded-lg shadow-md flex items-center justify-center transform rotate-6">
-                          <Moon size={16} className="text-white" />
-                        </div>
-                      </div>
+        {/* VOM Kit Section - Compact */}
+        <section className="py-12 md:py-16 px-6 bg-gradient-to-r from-[#FFF8F0] to-[#F0F9F8] relative overflow-hidden">
+          <div className="max-w-5xl mx-auto">
+            <div className="flex flex-col md:flex-row items-center gap-6 md:gap-10">
+              {/* Left: Package Visual */}
+              <div className="relative w-[180px] h-[200px] md:w-[220px] md:h-[240px] shrink-0">
+                <div className="absolute inset-0 bg-gradient-to-br from-[#F5E6E1] to-[#E8D5CE] rounded-2xl shadow-lg transform rotate-[-3deg]"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-[#FFFAF8] to-[#FFF0E6] rounded-2xl shadow-md border-2 border-[#F5E6E1] p-4 flex flex-col items-center justify-center">
+                  <div className="text-lg md:text-xl font-bold text-[#C26D53] tracking-wider mb-1">V.O.M Kit</div>
+                  <div className="text-[9px] text-[#D48B71] mb-3">Voice of Mother</div>
+                  {/* Mini Cards */}
+                  <div className="flex gap-1">
+                    <div className="w-9 h-12 bg-gradient-to-br from-[#FFB6B6] to-[#FF8E8E] rounded-md shadow flex items-center justify-center transform -rotate-6">
+                      <Droplets size={12} className="text-white" />
+                    </div>
+                    <div className="w-9 h-12 bg-gradient-to-br from-[#A8F0EA] to-[#5B9E99] rounded-md shadow flex items-center justify-center">
+                      <Baby size={12} className="text-white" />
+                    </div>
+                    <div className="w-9 h-12 bg-gradient-to-br from-[#E9D5FF] to-[#8B5CF6] rounded-md shadow flex items-center justify-center transform rotate-6">
+                      <Moon size={12} className="text-white" />
                     </div>
                   </div>
-
                   {/* Ribbon */}
-                  <div className="absolute -right-3 top-1/3 w-8 h-16 bg-[#C26D53] rounded-r-lg shadow-md flex items-center justify-center">
-                    <span className="text-white text-[8px] font-bold writing-mode-vertical transform rotate-180" style={{ writingMode: 'vertical-rl' }}>NEW</span>
+                  <div className="absolute -right-2 top-3 px-2 py-1 bg-[#C26D53] rounded-l-md shadow text-white text-[7px] font-bold">
+                    NEW
                   </div>
                 </div>
               </div>
 
-              {/* Kit Contents List */}
-              <div className="flex-1 max-w-md space-y-4">
-                <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-6">Kit 구성품</h3>
-
-                {[
-                  { icon: Package, title: '프리미엄 패키지', desc: '책가방 스타일 종이 패키징', color: '#C26D53' },
-                  { icon: Mail, title: 'Thank You 엔벨롭', desc: '감사 카드 & 사용 가이드', color: '#D48B71' },
-                  { icon: CreditCard, title: '마스터 카드', desc: '학생증 느낌의 메인 카드', color: '#4A8B86' },
-                  { icon: Sparkles, title: 'NFC 카드 세트', desc: '수유, 기저귀, 수면 기록용 카드', color: '#8B5CF6' },
-                  { icon: Magnet, title: '냉장고 NFC 패널', desc: '돌돌 말린 자석 부착형 패널', color: '#5B9E99' },
-                ].map((item, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center gap-4 p-4 bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:-translate-y-0.5 transition-all"
-                  >
-                    <div
-                      className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
-                      style={{ backgroundColor: `${item.color}15` }}
-                    >
-                      <item.icon size={24} style={{ color: item.color }} />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-gray-900">{item.title}</h4>
-                      <p className="text-sm text-gray-500">{item.desc}</p>
-                    </div>
-                  </div>
-                ))}
-
-                {/* CTA Button */}
-                <div className="pt-6">
-                  <button
-                    className="w-full py-4 bg-gradient-to-r from-[#C26D53] to-[#D48B71] text-white rounded-2xl font-bold text-lg shadow-[0_10px_30px_rgba(194,109,83,0.3)] hover:shadow-[0_15px_40px_rgba(194,109,83,0.4)] hover:-translate-y-1 transition-all flex items-center justify-center gap-2"
-                  >
-                    <Bell size={20} />
-                    출시 알림 받기
-                  </button>
-                  <p className="text-center text-sm text-gray-400 mt-3">
-                    출시되면 가장 먼저 알려드릴게요
-                  </p>
+              {/* Right: Info */}
+              <div className="flex-1 text-center md:text-left">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFF0E6] text-[#C26D53] font-bold text-xs mb-2">
+                  <Gift size={12} /> Coming Soon
                 </div>
+                <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-1">
+                  육아의 시작을 함께해요
+                </h2>
+                <p className="text-gray-600 text-sm mb-3 max-w-sm">
+                  NFC 카드, 마스터 카드, 냉장고 패널까지 한 박스에.
+                </p>
+
+                {/* Compact Item Tags */}
+                <div className="flex flex-wrap gap-1.5 justify-center md:justify-start mb-4">
+                  {['📦 패키지', '💌 웰컴카드', '🪪 마스터카드', '💳 NFC x3', '🧲 냉장고패널'].map((item, i) => (
+                    <span key={i} className="px-2 py-1 bg-white rounded-full text-[11px] text-gray-600 shadow-sm border border-gray-100">
+                      {item}
+                    </span>
+                  ))}
+                </div>
+
+                {/* CTA */}
+                <button className="px-5 py-2.5 bg-gradient-to-r from-[#C26D53] to-[#D48B71] text-white rounded-full font-bold text-sm shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all inline-flex items-center gap-2">
+                  <Bell size={16} />
+                  출시 알림 받기
+                </button>
               </div>
             </div>
           </div>
